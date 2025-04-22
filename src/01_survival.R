@@ -7,62 +7,36 @@ library(IPDfromKM)   # For reconstructing IPD from Kaplan–Meier curves
 library(ggplot2)     # For visualizations
 library(dplyr)       # For data manipulation
 library(gridExtra)   # For arranging multiple plots
-library(bbplot)      # For custom themes (e.g., theme_fivethirtyeight)
+library(ggthemes)      # For custom themes (e.g., theme_fivethirtyeight)
 library(cowplot)     # For arranging multiple plots in a grid
 
 # =============================================================================
 # 1. READ AND PREPARE DIGITIZED SURVIVAL DATA
 # =============================================================================
 
-# Custom function to enforce non-increasing survival (monotonicity)
 enforce_monotonicity <- function(df) {
   for (i in 2:nrow(df)) {
-    min_previous <- min(df$percentage[1:(i - 1)])
-    if (df$percentage[i] > min_previous) {
-      df$percentage[i] <- min_previous
+    min_previous <- min(df$sur[1:(i - 1)])
+    if (df$sur[i] > min_previous) {
+      df$sur[i] <- min_previous
     }
   }
   return(df)
 }
 
 # Read survival event data
-PFS <- read.csv("data/nivo+ipi_10yr_PFsurvival.csv", 
-                header = FALSE, col.names = c("time", "percentage"))
-OS  <- read.csv("data/nivo+ipi_10yr_survival.csv", 
-                header = FALSE, col.names = c("time", "percentage"))
+pfs_dat <- read.csv("data/nivo+ipi_10yr_PFsurvival.csv", 
+                header = FALSE, col.names = c("time", "sur")) %>% 
+  arrange(time)
 
-# Read censored data
-OS_censored  <- read.csv("data/nivo+ipi OS censored.csv", 
-                         header = FALSE, col.names = c("time", "percentage"))
-PFS_censored <- read.csv("data/nivo+ipi PFS censored.csv", 
-                         header = FALSE, col.names = c("time", "percentage"))
-
-# Convert from [0, 1] to [0, 100] if needed
-OS_censored$percentage  <- OS_censored$percentage * 100
-PFS_censored$percentage <- PFS_censored$percentage * 100
-
-# Attach censoring indicator (1 = censored, 0 = event)
-OS_censored$censored  <- 1
-PFS_censored$censored <- 1
-OS$censored           <- 0
-PFS$censored          <- 0
-
-# Merge and sort by time
-OS  <- bind_rows(OS, OS_censored) %>% arrange(time)
-PFS <- bind_rows(PFS, PFS_censored) %>% arrange(time)
+os_dat  <- read.csv("data/nivo+ipi_10yr_survival.csv", 
+                header = FALSE, col.names = c("time", "sur")) %>% 
+  arrange(time)
 
 # Enforce monotonic survival
-OS  <- enforce_monotonicity(OS)
-PFS <- enforce_monotonicity(PFS)
+os_dat  <- enforce_monotonicity(os_dat)
+pfs_dat <- enforce_monotonicity(pfs_dat)
 
-# Create data frames for IPD reconstruction
-os_dat  <- OS  %>% 
-  select(time, sur = percentage, status = censored) %>% 
-  arrange(time)
-
-pfs_dat <- PFS %>% 
-  select(time, sur = percentage, status = censored) %>% 
-  arrange(time)
 
 # =============================================================================
 # 2. DEFINE NUMBER-AT-RISK DATA
@@ -100,6 +74,7 @@ pre_os  <- preprocess(dat = os_dat[, c("time", "sur")],
                       trisk = trisk_os,
                       nrisk = nrisk_os,
                       maxy  = 1)
+
 pre_pfs <- preprocess(dat = pfs_dat[, c("time", "sur")],
                       trisk = trisk_pfs,
                       nrisk = nrisk_pfs,
@@ -139,7 +114,7 @@ km_combined <- bind_rows(os_km_data, pfs_km_data)
 
 # Plot the Kaplan–Meier curves with confidence intervals
 ggplot(km_combined, aes(x = time, y = surv, color = dataset)) +
-  geom_step(size = 1) +
+  geom_step(linewidth = 1) +
   geom_ribbon(aes(ymin = lower, ymax = upper, fill = dataset), alpha = 0.03) +
   scale_color_manual(values = c("blue", "orange")) +
   scale_fill_manual(values = c("blue", "orange")) +
@@ -214,7 +189,7 @@ ggplot() +
   geom_step(data = km_data_os, aes(x = time, y = surv),
             color = "black", size = 1) +
   geom_line(data = best_os_df, aes(x = time, y = surv),
-            color = "red", linetype = "dashed", size = 1) +
+            color = "red", linetype = "solid", size = 1) +
   labs(title = paste("OS: KM vs. Best Model (", best_os_name, ")", sep = ""),
        x     = "Time (Months)",
        y     = "Survival Probability") +
@@ -287,37 +262,60 @@ ggplot() +
 # 9. DEFINE CUSTOM THEME FOR PUBLICATION & COMBINE PLOTS
 # =============================================================================
 library(ggthemes)
-custom_theme <- theme_fivethirtyeight() +
-  theme(
-    plot.title    = element_text(hjust = 0.5, size = 14, face = "bold"),
-    axis.title    = element_text(size = 14),
-    axis.text     = element_text(size = 12),
-    legend.title  = element_text(size = 14),
-    legend.text   = element_text(size = 12),
-    panel.background = element_rect(fill = "white"),
-    plot.background  = element_rect(fill = "white"),
-    legend.position  = "bottom",
-    legend.key       = element_rect(fill = "white"),
-    legend.background = element_rect(fill = "white", size = 0.5, linetype = "solid")
-  )
+
+scientific_pub_theme <- function() {
+  theme_minimal() +
+    theme(
+      # Text elements
+      plot.title = element_text(hjust = 0.5, size = 16, face = "bold", margin = margin(b = 15)),
+      plot.subtitle = element_text(hjust = 0.5, size = 12, margin = margin(b = 10)),
+      axis.title = element_text(size = 14, face = "bold"),
+      axis.text = element_text(size = 12, color = "black"),
+      axis.text.x = element_text(margin = margin(t = 5)),
+      axis.text.y = element_text(margin = margin(r = 5)),
+      
+      # Legend formatting
+      legend.position = "bottom",
+      legend.title = element_text(size = 12, face = "bold"),
+      legend.text = element_text(size = 11),
+      legend.background = element_rect(fill = "white", color = NA),
+      legend.key = element_rect(fill = "white", color = NA),
+      legend.margin = margin(t = 10),
+      legend.box.spacing = unit(0.5, "cm"),
+      
+      # Grid and panel elements
+      panel.background = element_rect(fill = "white", color = NA),
+      panel.grid.major = element_line(color = "gray90"),
+      panel.grid.minor = element_line(color = "gray95"),
+      panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+      
+      # Plot background
+      plot.background = element_rect(fill = "white", color = NA),
+      plot.margin = margin(t = 20, r = 20, b = 20, l = 20),
+      
+      # Facet elements (if needed)
+      strip.background = element_rect(fill = "gray95"),
+      strip.text = element_text(size = 12, face = "bold")
+    )
+}
+
+
 
 # Combined Plot A: OS and PFS models overlay
 A <- ggplot() +
   geom_step(data = km_data_os, aes(x = time, y = surv),
-            color = "grey40", size = 1) +
+            color = "black", size = 2) +
   geom_line(data = best_os_df, aes(x = time, y = surv),
-            color = "#FF2700", linetype = "dashed", size = 1) +
+            color = "#D62728", linetype = "solid", size = 1) +
   geom_step(data = km_data_pfs, aes(x = time, y = surv),
-            color = "grey40", size = 1) +
+            color = "black", size = 2) +
   geom_line(data = best_pfs_df, aes(x = time, y = surv),
-            color = "#FF2700", linetype = "dashed", size = 1) +
-  scale_color_fivethirtyeight() +  # Use bbplot's color scale
+            color = "#1F77B4", linetype = "solid", size = 1) +
   labs(x = "Time (months)",
        y = "Survival Probability",
        color = "Model") +
   scale_y_continuous(labels = scales::percent_format(scale = 100), limits = c(0, 1)) +
-  custom_theme
-
+  scientific_pub_theme()
 # =============================================================================
 # 10. VALIDATION AGAINST PUBLISHED DATA
 #     (Timepoints: 36, 60, 120; plus median)
@@ -351,36 +349,54 @@ pfs_preds_at$endpoint <- "PFS Model Estimate"
 colnames(os_preds_at)  <- c("time", "estimate", "ci_lower", "ci_upper", "endpoint")
 colnames(pfs_preds_at) <- c("time", "estimate", "ci_lower", "ci_upper", "endpoint")
 
-# Combine OS and PFS model estimates
 model_preds <- bind_rows(os_preds_at, pfs_preds_at)
 
-B <- ggplot() +
-  # Published estimates (shifted left)
-  geom_point(data = timepoint_estimates_df, 
-             aes(x = time, y = estimate, color = "Published Data"), 
-             size = 3, shape = 17, position = position_dodge(width = 1)) +
-  geom_errorbar(data = timepoint_estimates_df, 
-                aes(x = time, ymin = ci_lower, ymax = ci_upper, color = "Published Data"), 
-                width = 0.2, position = position_dodge(width = 1)) +
-  geom_point(data = model_preds, 
-             aes(x = time, y = estimate, color = endpoint), 
-             size = 3, position = position_dodge(width = 0.3)) +
-  geom_errorbar(data = model_preds, 
-                aes(x = time, ymin = ci_lower, ymax = ci_upper, color = endpoint), 
-                width = 0.2, position = position_dodge(width = 0.3)) +
+B <- 
+  ggplot() +
+  geom_point(
+    data    = timepoint_estimates_df,
+    aes(x = time, y = estimate, color = "Published Data"),
+    size    = 3,
+    shape   = 17,
+    position = position_nudge(x = -0.1)
+  ) +
+  geom_errorbar(
+    data   = timepoint_estimates_df,
+    aes(x = time, ymin = ci_lower, ymax = ci_upper, color = "Published Data"),
+    width  = 0.1,
+    position = position_nudge(x = -0.1)
+  ) +
+  geom_point(
+    data    = model_preds,
+    aes(x = time, y = estimate, color = endpoint),
+    size    = 3,
+    position = position_nudge(x = 0.1)
+  ) +
+  # Model estimate error bars (nudged the same amount)
+  geom_errorbar(
+    data   = model_preds,
+    aes(x = time, ymin = ci_lower, ymax = ci_upper, color = endpoint),
+    width  = 0.1,
+    position = position_nudge(x = 0.1)
+  ) +
   facet_wrap(~endpoint, ncol = 1) +
-  scale_color_manual(values = c("OS Model Estimate" = "#FF2700", 
-                                "PFS Model Estimate" = "#FF2700", 
-                                "Published Data"     = "black")) +
-  labs(x = "Time (months)",
-       y = "",
-       color = "") +
-  scale_y_continuous(labels = scales::percent_format(scale = 100), limits = c(0, 1)) +
-  custom_theme +
+  scale_color_manual(
+    values = c(
+      "OS Model Estimate" = "#D62728",
+      "PFS Model Estimate" = "#1F77B4",
+      "Published Data"     = "black"
+    )
+  ) +
+  labs(
+    x     = "Time (months)",
+    y     = "",
+    color = ""
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 100),
+    limits = c(0, 1)
+  ) +
+  scientific_pub_theme() +
   theme(legend.position = "none")
 
-# Combine plots A and B into a grid and save the output
-#combined_plot <- plot_grid(A, B, labels = c("A", "B"), ncol = 2, 
-#                           rel_widths = c(2, 1))
 
-#ggsave("survival_curves.png", combined_plot, width = 12, height = 6, dpi = 300, bg = "white")

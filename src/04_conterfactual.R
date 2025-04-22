@@ -4,20 +4,23 @@ library(dplyr)
 library(tidyr)
 
 # Define a common time vector (in months)
-time_vec <- seq(0, 120, by = 1)  # From 0 to 120 months (10 years)
 
-0.3759776
-0.2432601
+time_grid <- seq(0, 120, by=0.1)
+
 # -----------------------------------------------
 # Step 1: Get Predictions from the Survival Models
 # -----------------------------------------------
 # For combination therapy (nivo+ipi)
-os_comb_summary <- summary(best_os_model_ni, t = time_vec, type = "survival")
-pfs_comb_summary <- summary(best_pfs_model_ni, t = time_vec, type = "survival")
+
+
+os_comb_summary <- summary(best_os_model_ni, t = time_grid, type = "survival")
+
+pfs_comb_summary <- summary(best_pfs_model_ni, t = time_grid, type = "survival")
 
 # For monotherapy (nivo only)
-os_mon_summary <- summary(best_os_model_n, t = time_vec, type = "survival")
-pfs_mon_summary <- summary(best_pfs_model_n, t = time_vec, type = "survival")
+os_mon_summary <- summary(best_os_model_n, t = time_grid, type = "survival")
+
+pfs_mon_summary <- summary(best_pfs_model_n, t = time_grid, type = "survival")
 
 # Extract survival estimates as vectors using the same time grid.
 os_comb <- sapply(os_comb_summary, function(x) x$est)
@@ -41,14 +44,14 @@ pfs_resistant <- pmax(pmin(pfs_resistant, 1), 0)
 # Step 3: Create Data Frames for Plotting
 # -----------------------------------------------
 df_OS <- data.frame(
-  time = time_vec,
+  time = time_grid,
   Nivolumab = os_mon,
   Nivolumab.Ipilimumab = os_comb,
   Resistant   = os_resistant
 )
 
 df_PFS <- data.frame(
-  time = time_vec,
+  time = time_grid,
   Nivolumab = pfs_mon,
   Nivolumab.Ipilimumab = pfs_comb,
   Resistant   = pfs_resistant
@@ -80,8 +83,7 @@ df %>%
 # Overall Survival Plot
 ggplot(df, aes(x = time, y = surv, color = Group)) +
   geom_line(size = 1.15) +
-  labs(title = "Counterfactual OS and PFS for Anti-PD-1 Responders/Non-Responders",
-       x = "Time (months)",
+  labs(x = "Time (months)",
        y = "Survival Probability",
        color = '') +
   facet_wrap(~type) +
@@ -89,10 +91,12 @@ ggplot(df, aes(x = time, y = surv, color = Group)) +
   scale_color_manual(values = c("Anti-PD-1 (Nivolumab) Model" = "#008Fd5", 
                                 "Anti-PD-1 Responders" = "#77AB43", 
                                 "Anti-PD-1 Resistant" = "#FF2700")) +
-  custom_theme +
+  scientific_pub_theme() +
   scale_y_continuous(labels = scales::percent_format(scale = 100), 
                      limits = c(0,1)) +
-  theme(legend.position = "top") 
+  theme(legend.position = "bottom") 
+
+
 
 ggsave("counterfactual_survival.png", width = 10, height = 6, dpi = 300) 
 

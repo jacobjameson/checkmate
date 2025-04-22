@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.5)  9 FEB 2025 13:04
+This is pdfTeX, Version 3.141592653-2.6-1.40.26 (TeX Live 2024) (preloaded format=pdflatex 2025.2.5)  12 FEB 2025 17:10
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -720,74 +720,137 @@ Package hyperref Warning: Token not allowed in a PDF string (Unicode):
 [1
 
 {/Users/jacobjameson/Library/TinyTeX/texmf-var/fonts/map/pdftex/updmap/pdftex.map}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ec.enc}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathsy.enc}]
-LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 208.
+<../outputs/model.png, id=80, 960.81503pt x 540.5629pt>
+File: ../outputs/model.png Graphic file (type png)
+<use ../outputs/model.png>
+Package pdftex.def Info: ../outputs/model.png  used on input line 202.
+(pdftex.def)             Requested size: 468.0pt x 263.29446pt.
+
+
+[2 <../outputs/model.png>]
+LaTeX Font Info:    Trying to load font information for TS1+lmr on input line 230.
 (/Users/jacobjameson/Library/TinyTeX/texmf-dist/tex/latex/lm/ts1lmr.fd
 File: ts1lmr.fd 2015/05/01 v1.6.1 Font defs for Latin Modern
 )
-<../outputs/model.png, id=78, 960.81503pt x 540.5629pt>
-File: ../outputs/model.png Graphic file (type png)
-<use ../outputs/model.png>
-Package pdftex.def Info: ../outputs/model.png  used on input line 248.
-(pdftex.def)             Requested size: 468.0pt x 263.29446pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
-
-[2{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}]
 <../outputs/survival_curves.png, id=92, 867.24pt x 722.7pt>
 File: ../outputs/survival_curves.png Graphic file (type png)
 <use ../outputs/survival_curves.png>
-Package pdftex.def Info: ../outputs/survival_curves.png  used on input line 275.
+Package pdftex.def Info: ../outputs/survival_curves.png  used on input line 286.
 (pdftex.def)             Requested size: 421.19714pt x 351.00531pt.
 
 LaTeX Warning: `h' float specifier changed to `ht'.
 
 
 
-[3 <../outputs/model.png>]
-<../outputs/counterfactual_survival.png, id=100, 722.7pt x 433.62pt>
-File: ../outputs/counterfactual_survival.png Graphic file (type png)
-<use ../outputs/counterfactual_survival.png>
-Package pdftex.def Info: ../outputs/counterfactual_survival.png  used on input line 336.
-(pdftex.def)             Requested size: 421.19714pt x 252.71721pt.
-
-LaTeX Warning: `h' float specifier changed to `ht'.
-
-
+[3{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-ts1.enc}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-mathit.enc}{/Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/enc/dvips/lm/lm-rm.enc}]
 
 [4 <../outputs/survival_curves.png>]
-Overfull \hbox (15.02074pt too wide) in paragraph at lines 367--396
+<../outputs/counterfactual_survival.png, id=108, 722.7pt x 433.62pt>
+File: ../outputs/counterfactual_survival.png Graphic file (type png)
+<use ../outputs/counterfactual_survival.png>
+Package pdftex.def Info: ../outputs/counterfactual_survival.png  used on input line 347.
+(pdftex.def)             Requested size: 421.19714pt x 252.71721pt.
+
+
+[5 <../outputs/counterfactual_survival.png>]
+Overfull \hbox (15.02074pt too wide) in paragraph at lines 378--407
 [][] 
  []
 
 
 
-[5 <../outputs/counterfactual_survival.png>]
+[6]
 
-[6] (./article.bbl)
+Package natbib Warning: Citation `ref1' on page 7 undefined on input line 494.
 
-[7] (./article.aux)
+
+Package natbib Warning: Citation `ref2' on page 7 undefined on input line 495.
+
+
+Package natbib Warning: Citation `ref1' on page 7 undefined on input line 496.
+
+
+Package natbib Warning: Citation `ref2' on page 7 undefined on input line 496.
+
+
+Package natbib Warning: Citation `ref3' on page 7 undefined on input line 503.
+
+
+Package natbib Warning: Citation `ref4' on page 7 undefined on input line 503.
+
+
+Package natbib Warning: Citation `ref3' on page 7 undefined on input line 504.
+
+
+Package natbib Warning: Citation `ref4' on page 7 undefined on input line 504.
+
+
+Package natbib Warning: Citation `ref5' on page 7 undefined on input line 505.
+
+
+Package natbib Warning: Citation `ref6' on page 7 undefined on input line 505.
+
+
+Package natbib Warning: Citation `ref5' on page 7 undefined on input line 506.
+
+
+Package natbib Warning: Citation `ref6' on page 7 undefined on input line 506.
+
+
+Package natbib Warning: Citation `ref7' on page 7 undefined on input line 512.
+
+
+Package natbib Warning: Citation `ref7' on page 7 undefined on input line 513.
+
+
+Package natbib Warning: Citation `ref7' on page 7 undefined on input line 514.
+
+
+Package natbib Warning: Citation `ref8' on page 7 undefined on input line 519.
+
+
+Package natbib Warning: Citation `ref9' on page 7 undefined on input line 519.
+
+
+Package natbib Warning: Citation `ref8' on page 7 undefined on input line 520.
+
+
+Package natbib Warning: Citation `ref9' on page 7 undefined on input line 520.
+
+
+Overfull \hbox (107.47154pt too wide) in paragraph at lines 476--525
+ [][] 
+ []
+
+(./article.bbl
+
+[7])
+
+Package natbib Warning: There were undefined citations.
+
+
+
+[8] (./article.aux)
  ***********
 LaTeX2e <2024-11-01> patch level 2
 L3 programming layer <2025-01-18>
  ***********
 Package rerunfilecheck Info: File `article.out' has not changed.
-(rerunfilecheck)             Checksum: 657F63D4AB05126693E983F5031FE469;1603.
+(rerunfilecheck)             Checksum: EE8493557F4B3C58A974C1E01CABF094;1749.
  ) 
 Here is how much of TeX's memory you used:
- 15719 strings out of 475172
- 254176 string characters out of 5764614
- 685153 words of memory out of 5000000
- 38298 multiletter control sequences out of 15000+600000
- 620776 words of font info for 147 fonts, out of 8000000 for 9000
+ 15731 strings out of 475172
+ 254360 string characters out of 5764614
+ 686133 words of memory out of 5000000
+ 38303 multiletter control sequences out of 15000+600000
+ 620990 words of font info for 149 fonts, out of 8000000 for 9000
  14 hyphenation exceptions out of 8191
- 72i,13n,79p,1107b,461s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 72i,13n,79p,1107b,617s stack positions out of 10000i,1000n,20000p,200000b,200000s
 </Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmbx10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmmi10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr12.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr6.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr7.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmr8.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri7.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmri8.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy6.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmsy7.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt10.pfb></Users/jacobjameson/Library/TinyTeX/texmf-dist/fonts/type1/public/lm/lmtt8.pfb>
-Output written on article.pdf (7 pages, 955296 bytes).
+Output written on article.pdf (8 pages, 992963 bytes).
 PDF statistics:
- 211 PDF objects out of 1000 (max. 8388607)
- 165 compressed objects within 2 object streams
- 34 named destinations out of 1000 (max. 500000)
- 33896 words of extra memory for PDF output out of 35830 (max. 10000000)
+ 223 PDF objects out of 1000 (max. 8388607)
+ 176 compressed objects within 2 object streams
+ 37 named destinations out of 1000 (max. 500000)
+ 33904 words of extra memory for PDF output out of 35830 (max. 10000000)
 

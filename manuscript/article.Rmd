@@ -87,6 +87,29 @@ Our objectives are to:
 
 We compared the cost-effectiveness of a biomarker-driven treatment allocation strategy versus a standard one-size-fits-all approach for first-line immunotherapy in advanced melanoma. The standard strategy involved treating all patients with nivolumab monotherapy, while the biomarker-driven strategy allocated patients to either nivolumab only or nivolmab plus ipilimumab based on their predicted response to single-agent PD-1 blockade. We created a Markov model to simulate treatments, adverse events, quality of life, costs, and survival among simulated patients. The state transition diagram (Figure [\ref{fig:model}](#fig:model)) shows how patients move through the Markov model. The three main health states were stable disease, cancer progression, and death. Our cost-effectiveness model used a one-month cycle length extending over a 10-year time horizon, which is the length of time for the final follow-up in the CheckMate 067 trial [@checkmate067]. The Markov and survival models were constructed and analyzed in R (version 4.4.2). The design and reporting of this cost-effectiveness analysis follow standard guidelines published elsewhere [@Sanders2016].
 
+\begin{figure}[h]
+\centering
+\includegraphics[width=\textwidth]{../outputs/model.png}
+\caption{State-transition diagram of the Markov model}
+\label{fig:model}
+\begin{tablenotes}
+\footnotesize
+\item \textit{Note}: Patients transition between stable disease, progressive disease, and death. Adverse events are modeled as temporary events with associated cost and utility decrements.
+\end{tablenotes}
+\end{figure}
+
+## Treatment Details
+
+We used the CheckMate 067 trial as a construct to model the different treatment groups. Patients in the nivolumab group received treatment every two weeks at a dose of 3 mgkg. The optimal length of nivolumab treatment among long-term responders is unknown; therefore, we evaluated different scenarios and assessed how these assumptions impacted the cost-effectiveness of this treatment. Our base case analysis followed the CheckMate 067 protocol, whereby patients received nivolumab until disease progression. We also tested scenarios
+
+
+
+
+
+
+
+
+
 
 
 ## Model Structure
@@ -119,16 +142,7 @@ where:
 
 Figure [\ref{fig:model}](#fig:model) displays the state-transition diagram of the model.
 
-\begin{figure}[h]
-\centering
-\includegraphics[width=\textwidth]{../outputs/model.png}
-\caption{State-transition diagram of the Markov model. Patients transition between stable disease, progressive disease, and death. Adverse events are modeled as temporary events with associated cost and utility decrements.}
-\label{fig:model}
-\begin{tablenotes}
-\footnotesize
-\item \textit{Note}: Arrows indicate possible transitions. Patients experiencing toxicity remain in their current health state but incur additional costs and a reduction in utility.
-\end{tablenotes}
-\end{figure}
+
 
 ## Model Probabilities and Calibration
 
@@ -236,7 +250,60 @@ Several limitations warrant discussion. First, our survival models are extrapola
 
 Future research should integrate real-world data to further refine these estimates and explore the inclusion of additional biomarkers and treatment modalities. Nonetheless, our findings provide a strong rationale for personalized treatment strategies in advanced melanoma, with the potential to improve clinical outcomes and optimize resource allocation.
 
+\begin{table}[ht!]
+\centering
+\caption{Base-Case Parameters for the Cost-Effectiveness Model: NIVO vs.\ NIVO+IPI}
+\label{tab:cea-parameters}
+\begin{tabular}{l l l l}
+\toprule
+\textbf{Parameter} & \textbf{Base-Case Value} & \textbf{PSA (Distribution/Range)} & \textbf{Source} \\
+\midrule
+\multicolumn{4}{l}{\textbf{Model Time Horizon and Discounting}} \\
+\midrule
+Time horizon (years)               & 10 (monthly cycles) & -- & User-defined \\ 
+Discount rate (\% per year)        & 3\%                 & -- & Standard guidelines \\
 
+\midrule
+\multicolumn{4}{l}{\textbf{Survival Inputs (CheckMate\,067 Fitted Models)}} \\
+\midrule
+NIVO OS/PFS model       & Parametric or K--M fit & -- & Trial / user fits \\
+NIVO+IPI OS/PFS model   & Parametric or K--M fit & -- & Trial / user fits \\
+
+\midrule
+\multicolumn{4}{l}{\textbf{Drug Acquisition Costs (Per Cycle)}} \\
+\midrule
+Nivolumab cost          & \$14{,}975 & Gamma (95\%\,CI: 9{,}703--21{,}417) & AWP\cite{ref1} \\ 
+Ipilimumab cost         & \$11{,}450 & Gamma (7{,}413--16{,}296)          & AWP\cite{ref2} \\
+NIVO+IPI combination    & \$26{,}425 & Gamma (17{,}089--37{,}662)         & AWP\cite{ref1,ref2} \\
+
+\midrule
+\multicolumn{4}{l}{\textbf{Adverse Events (AE)}} \\
+\midrule
+Probability G3--4 AE (NIVO) per cycle   & 0.05 & Beta (0.03--0.07) & Derived from trial \\
+Probability G3--4 AE (NIVO+IPI) p/cycle & 0.15 & Beta (0.10--0.20) & Derived from trial \\
+Cost per severe AE (NIVO)               & \$1{,}185 & Gamma (767--1{,}695)  & \cite{ref3,ref4}\\
+Cost per severe AE (NIVO+IPI)           & \$6{,}384 & Gamma (4{,}139--9{,}127) & \cite{ref3,ref4}\\
+AE disutility (NIVO) per cycle          & 0.017 & Beta (0.011--0.024)     & \cite{ref5,ref6}\\
+AE disutility (NIVO+IPI) per cycle      & 0.019 & Beta (0.012--0.027)     & \cite{ref5,ref6}\\
+AE duration (cycles)                    & 1     & --                      & Placeholder assumption \\
+
+\midrule
+\multicolumn{4}{l}{\textbf{Health-State Costs (Per Cycle)}} \\
+\midrule
+Stable disease cost       & \$2{,}166 & Gamma (1{,}397--3{,}098)  & \cite{ref7} \\
+Progressed disease cost   & \$4{,}000 & Gamma (2{,}575--5{,}512)  & \cite{ref7} \\
+Palliative care (one-time)& \$15{,}957& Gamma (10{,}335--23{,}818)& \cite{ref7} \\
+
+\midrule
+\multicolumn{4}{l}{\textbf{Utilities (Annual)} } \\
+\midrule
+Progression-free utility  & 0.754 & Beta (0.47--0.97) & \cite{ref8,ref9} \\
+Progressed utility        & 0.180 & Beta (0.11--0.37) & \cite{ref8,ref9} \\
+Death                     & 0     & --                & Standard assumption \\
+
+\bottomrule
+\end{tabular}
+\end{table}
 
 
 # References {-}

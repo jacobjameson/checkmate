@@ -7,7 +7,6 @@ library(IPDfromKM)   # For reconstructing IPD from Kaplan–Meier curves
 library(ggplot2)     # For visualizations
 library(dplyr)       # For data manipulation
 library(gridExtra)   # For arranging multiple plots
-library(bbplot)      # For custom themes (e.g., theme_fivethirtyeight)
 library(cowplot)     # For arranging multiple plots in a grid
 
 # =============================================================================
@@ -291,19 +290,19 @@ custom_theme <- theme_fivethirtyeight() +
 # Combined Plot A: OS and PFS models overlay
 C <- ggplot() +
   geom_step(data = km_data_os, aes(x = time, y = surv),
-            color = "grey40", size = 1) +
+            color = "black", size = 2) +
   geom_line(data = best_os_df, aes(x = time, y = surv),
-            color = "#008Fd5", linetype = "dashed", size = 1) +
+            color = "#D62728", linetype = "solid", size = 1) +
   geom_step(data = km_data_pfs, aes(x = time, y = surv),
-            color = "grey40", size = 1) +
+            color = "black", size = 2) +
   geom_line(data = best_pfs_df, aes(x = time, y = surv),
-            color = "#008Fd5", linetype = "dashed", size = 1) +
+            color = "#1F77B4", linetype = "solid", size = 1) +
   scale_color_fivethirtyeight() +  # Use bbplot's color scale
   labs(x = "Time (months)",
        y = "Survival Probability",
        color = "Model") +
   scale_y_continuous(labels = scales::percent_format(scale = 100), limits = c(0, 1)) +
-  custom_theme
+  scientific_pub_theme()
 
 # =============================================================================
 # 10. VALIDATION AGAINST PUBLISHED DATA
@@ -341,45 +340,107 @@ colnames(pfs_preds_at) <- c("time", "estimate", "ci_lower", "ci_upper", "endpoin
 # Combine OS and PFS model estimates
 model_preds <- bind_rows(os_preds_at, pfs_preds_at)
 
-D <- ggplot() +
-  # Published estimates (shifted left)
-  geom_point(data = timepoint_estimates_df, 
-             aes(x = time, y = estimate, color = "Published Data"), 
-             size = 3, shape = 17, position = position_dodge(width = 1)) +
-  geom_errorbar(data = timepoint_estimates_df, 
-                aes(x = time, ymin = ci_lower, ymax = ci_upper, color = "Published Data"), 
-                width = 0.2, position = position_dodge(width = 1)) +
-  geom_point(data = model_preds, 
-             aes(x = time, y = estimate, color = endpoint), 
-             size = 3, position = position_dodge(width = 0.3)) +
-  geom_errorbar(data = model_preds, 
-                aes(x = time, ymin = ci_lower, ymax = ci_upper, color = endpoint), 
-                width = 0.2, position = position_dodge(width = 0.3)) +
+D <- 
+  ggplot() +
+  geom_point(
+    data    = timepoint_estimates_df,
+    aes(x = time, y = estimate, color = "Published Data"),
+    size    = 3,
+    shape   = 17,
+    position = position_nudge(x = -0.1)
+  ) +
+  geom_errorbar(
+    data   = timepoint_estimates_df,
+    aes(x = time, ymin = ci_lower, ymax = ci_upper, color = "Published Data"),
+    width  = 0.1,
+    position = position_nudge(x = -0.1)
+  ) +
+  geom_point(
+    data    = model_preds,
+    aes(x = time, y = estimate, color = endpoint),
+    size    = 3,
+    position = position_nudge(x = 0.1)
+  ) +
+  # Model estimate error bars (nudged the same amount)
+  geom_errorbar(
+    data   = model_preds,
+    aes(x = time, ymin = ci_lower, ymax = ci_upper, color = endpoint),
+    width  = 0.1,
+    position = position_nudge(x = 0.1)
+  ) +
   facet_wrap(~endpoint, ncol = 1) +
-  scale_color_manual(values = c("OS Model Estimate" = "#008Fd5", 
-                                "PFS Model Estimate" = "#008Fd5", 
-                                "Published Data"     = "black")) +
-  labs(x = "Time (months)",
-       y = "",
-       color = "") +
-  scale_y_continuous(labels = scales::percent_format(scale = 100), limits = c(0, 1)) +
-  custom_theme +
+  scale_color_manual(
+    values = c(
+      "OS Model Estimate" = "#D62728",
+      "PFS Model Estimate" = "#1F77B4",
+      "Published Data"     = "black"
+    )
+  ) +
+  labs(
+    x     = "Time (months)",
+    y     = "",
+    color = ""
+  ) +
+  scale_y_continuous(
+    labels = scales::percent_format(scale = 100),
+    limits = c(0, 1)
+  ) +
+  scientific_pub_theme() +
   theme(legend.position = "none")
 
 library(cowplot)
 
+# First, create a custom legend using the gridExtra and grid packages
+library(gridExtra)
+library(grid)
+
 # Create individual titles
-title_top <- ggdraw() + draw_label("Nivolumab + Ipilimumab", fontface = 'bold', hjust = 0.5)
-title_bottom <- ggdraw() + draw_label("Nivolumab", fontface = 'bold', hjust = 0.5)
+title_top <- ggdraw() + draw_label("Nivolumab + Ipilimumab combination therapy", fontface = 'bold', hjust = 0.5)
+title_bottom <- ggdraw() + draw_label("Nivolumab monotherapy", fontface = 'bold', hjust = 0.5)
+
+# Create legend using a single ggplot object for tighter control
+# Create legend using a single ggplot object for tighter control
+legend_plot <- ggplot() + 
+  theme_minimal() +
+  # Add rectangles and text with precise positioning
+  # Horizontally centered the elements better and added more margin space
+  annotate("rect", xmin = 0.1, xmax = 0.13, ymin = 0.25, ymax = 0.75, fill = "black") +
+  annotate("text", x = 0.14, y = 0.5, label = "Checkmate 067", hjust = 0) +
+  
+  annotate("rect", xmin = 0.33, xmax = 0.36, ymin = 0.25, ymax = 0.75, fill = "#D62728") +
+  annotate("text", x = 0.37, y = 0.5, label = "Model Estimated OS", hjust = 0) +
+  
+  annotate("rect", xmin = 0.65, xmax = 0.68, ymin = 0.25, ymax = 0.75, fill = "#1F77B4") +
+  annotate("text", x = 0.69, y = 0.5, label = "Model Estimated PFS", hjust = 0) +
+  
+  # Set plot limits to control spacing
+  xlim(0, 1) + ylim(0, 1)
+
 
 # Arrange the plots with titles
-combined_top <- plot_grid(title_top, plot_grid(A, B, labels = c("A", "B"), ncol = 2, rel_widths = c(1.25, 1)), ncol = 1, rel_heights = c(0.1, 1))
-combined_bottom <- plot_grid(title_bottom, plot_grid(C, D, labels = c("C", "D"), ncol = 2, rel_widths = c(1.25, 1)), ncol = 1, rel_heights = c(0.1, 1))
+combined_top <- plot_grid(
+  title_top, 
+  plot_grid(A, B, labels = c("A", "B"), ncol = 2, rel_widths = c(1.25, 1)), 
+  ncol = 1, 
+  rel_heights = c(0.1, 1)
+)
 
-# Combine everything
-combined_plot <- plot_grid(combined_top, combined_bottom, ncol = 1)
+combined_bottom <- plot_grid(
+  title_bottom, 
+  plot_grid(C, D, labels = c("C", "D"), ncol = 2, rel_widths = c(1.25, 1)), 
+  ncol = 1, 
+  rel_heights = c(0.1, 1)
+)
 
-# Display the final plot
+# Combine everything with the horizontal legend at the bottom
+combined_plot <- plot_grid(
+  combined_top, 
+  combined_bottom, 
+  legend, 
+  ncol = 1, 
+  rel_heights = c(1, 1, 0.12)  # Increased from 0.07 to 0.12 for more bottom margin
+)
+
 print(combined_plot)
 
-ggsave("survival_curves.png", combined_plot, width = 12, height = 10, dpi = 300, bg = "white")
+ggsave("outputs/survival_curves.png", combined_plot, width = 12, height = 10, dpi = 300, bg = "white")
